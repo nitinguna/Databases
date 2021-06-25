@@ -17,10 +17,10 @@ class Saver {
     private var outputStream: FileOutputStream? = null
     private var opened: Boolean = false
 
-    fun open() {
+    fun open(resultFile : String) {
         if (!opened) {
             try {
-                val file = File(Environment.getExternalStorageDirectory(), FILE_NAME)
+                val file = File(Environment.getExternalStorageDirectory(), resultFile)
                 if (file.exists()) {
                     file.delete()
                 }
@@ -59,29 +59,44 @@ class Saver {
         }
     }
 
-    fun save(resultSet: ResultSet) {
-        open()
+    fun save(resultSet: ResultSet, resultFile : String , type : String) {
+        open(resultFile)
 
-        saveResult(resultSet.creating)
-        saveResult(resultSet.reading)
-        saveResult(resultSet.deleting)
-        saveResult(resultSet.updating)
+//        saveResult(resultSet.creating)
+        saveResult(resultSet.reading, resultFile,type)
+//        saveResult(resultSet.deleting)
+//        saveResult(resultSet.updating)
 
         close()
     }
 
-    private fun saveResult(result: Result) {
+    private fun saveResult(result: Result, resultFile: String, type : String) {
+        var key: String? = null
+        var timesAvg: String? = null
         write(result.type + NEW_LINE)
-        for (type in TestConstants.TYPES) {
+        //for (type in TestConstants.TYPES) {
             for (size in TestConstants.SIZES) {
-                val key = size.toString() + "-" + type
+                key = size.toString() + "-" + type
                 val times = result.times[key]
-                write(key + SEPARATOR)
-                write(times!!.average().toString() + SEPARATOR)
-                write(NEW_LINE)
+                times.let {it ->
+                    if (it != null) {
+                        var i:Int =0
+                        for (it1 in it) {
+                             i=i+1;
+                            val keyit = type+"-"+i
+                            write(keyit + SEPARATOR)
+                            write(it1.toString() + SEPARATOR)
+                            write(NEW_LINE)
+                        }
+                    }
+
+                }
+                 timesAvg = times!!.average().toString()
             }
+        write(key+"avg" + SEPARATOR)
+        write(timesAvg + SEPARATOR)
             write(NEW_LINE)
-        }
+        //}
         write(NEW_LINE)
         write(NEW_LINE)
     }

@@ -4,6 +4,7 @@ package com.maciejkozlowski.databases.realm
 import android.content.Context
 import com.maciejkozlowski.databases.BaseLoader
 import com.maciejkozlowski.databases.Timings
+import com.maciejkozlowski.databases.objectbox.CityBox_.latitude
 import com.maciejkozlowski.databases.results.ResultSet
 import io.realm.Realm
 
@@ -11,6 +12,28 @@ import io.realm.Realm
  * Created by Maciej Kozłowski on 01.05.17.
  */
 class CitiesLoaderRealm : BaseLoader<CityRealm>() {
+
+    fun createdb(context: Context, resultSet: ResultSet, realm: Realm, size: Int){
+        val cities = readFromFile(context, CITIES_CSV, size)
+
+        realm.beginTransaction()
+        realm.insert(cities)
+        realm.commitTransaction()
+
+    }
+
+    fun readdb(context: Context, resultSet: ResultSet, realm: Realm, size: Int){
+        logger.start()
+        //val cityRealms = realm.where(CityRealm::class.java).findAll()
+        val cityRealms = realm.where(CityRealm::class.java).equalTo("latitude",6.19139)
+        logger.logTime(resultSet.reading, BaseLoader.READ_CITIES, size)
+    }
+
+    fun deletedb(context: Context, resultSet: ResultSet, realm: Realm, size: Int){
+        realm.beginTransaction()
+        realm.delete(CityRealm::class.java)
+        realm.commitTransaction()
+    }
 
     fun execute(context: Context, resultSet: ResultSet, realm: Realm, size: Int) {
         val cities = readFromFile(context, CITIES_CSV, size)

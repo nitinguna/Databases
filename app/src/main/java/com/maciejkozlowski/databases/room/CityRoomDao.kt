@@ -11,7 +11,7 @@ import androidx.room.Update
 @Dao
 interface CityRoomDao {
 
-    @Query("SELECT * FROM CityRoom")
+    @Query("SELECT * FROM CityRoom where latitude = 6.19139" )
     fun getAll(): List<CityRoom>
 
     @Insert

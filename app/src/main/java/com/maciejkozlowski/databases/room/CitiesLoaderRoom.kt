@@ -12,6 +12,26 @@ import com.maciejkozlowski.databases.results.ResultSet
  */
 class CitiesLoaderRoom : BaseLoader<CityRoom>() {
 
+    fun creatdb(context: Context, resultSet: ResultSet, database: CityRoomDao, size: Int){
+        val cities = readFromFile(context, CITIES_CSV, size)
+
+       // logger.start()
+        database.insertAll(cities)
+        //logger.logTime(resultSet.creating, INSERT_CITIES, size)
+    }
+
+    fun readdb(context: Context, resultSet: ResultSet, database: CityRoomDao, size: Int){
+        logger.start()
+        val cityRoomList = database.getAll()
+        logger.logTime(resultSet.reading, READ_CITIES, size)
+    }
+
+    fun deletedb(context: Context, resultSet: ResultSet, database: CityRoomDao, size: Int){
+       // logger.start()
+        database.deleteAll()
+       // logger.logTime(resultSet.deleting, DELETE_CITIES, size)
+    }
+
     fun execute(context: Context, resultSet: ResultSet, database: CityRoomDao, size: Int) {
         val cities = readFromFile(context, CITIES_CSV, size)
 

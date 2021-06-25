@@ -23,33 +23,53 @@ class DatabasesTest {
     private val resultSet = ResultSet()
 
     private val citiesLoaderSql = CitiesLoaderSql()
-    private val citiesLoaderRoom = CitiesLoaderRoom()
+
     private val citiesLoaderDao = CitiesLoaderDao()
     private val citiesLoaderBox = CitiesLoaderBox()
-    private val citiesLoaderRealm = CitiesLoaderRealm()
+
 
     @org.junit.Test
-    fun testDatabases() {
+    fun testDatabasesRoom() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
         val application = context as MyApplication
+        val citiesLoaderRoom = CitiesLoaderRoom()
 
-        val citiesDatabase = CitiesDatabase(context)
         val cityRoomDao = application.room.getCityRoomDao()
-        val cityDaoDao = application.daoSession.cityDaoDao
-        val realm = Realm.getDefaultInstance()
-        val cityBox = application.boxStore.boxFor(CityBox::class.java)
 
+        citiesLoaderRoom.creatdb(context, resultSet, cityRoomDao, 1)
         TestConstants.SIZES.forEach { size ->
-            for (repeat in 0 until 10) {
+            for (repeat in 0 until 5) {
                 Log.d("###hash", repeat.toString())
-                citiesLoaderSql.execute(context, resultSet, citiesDatabase, size)
-                citiesLoaderRoom.execute(context, resultSet, cityRoomDao, size)
-                citiesLoaderDao.execute(context, resultSet, cityDaoDao, size)
-                citiesLoaderRealm.execute(context, resultSet, realm, size)
-                citiesLoaderBox.execute(context, resultSet, cityBox, size)
+               citiesLoaderRoom.readdb(context, resultSet, cityRoomDao, size)
+
             }
         }
+        citiesLoaderRoom.deletedb(context, resultSet, cityRoomDao, 1)
 
-        Saver().save(resultSet)
+        Saver().save(resultSet,"RoomResults.csv",CitiesLoaderRoom.TAG )
+    }
+
+    @org.junit.Test
+    fun testDatabasesRealm() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+        val application = context as MyApplication
+        val citiesLoaderRealm = CitiesLoaderRealm()
+
+
+        val realm = Realm.getDefaultInstance()
+
+
+        citiesLoaderRealm.createdb(context, resultSet, realm, 1)
+        TestConstants.SIZES.forEach { size ->
+            for (repeat in 0 until 5) {
+                Log.d("###hash", repeat.toString())
+
+                citiesLoaderRealm.readdb(context, resultSet, realm, size)
+
+            }
+        }
+        citiesLoaderRealm.deletedb(context, resultSet, realm, 1)
+
+        Saver().save(resultSet,"RealmResults.csv", CitiesLoaderRealm.TAG)
     }
 }
